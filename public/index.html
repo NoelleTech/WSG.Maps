@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Excalidraw in browser</title>
+    <meta charset="UTF-8" />
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/@excalidraw/excalidraw/dist/excalidraw.development.js"
+    ></script>
+    <script type="text/javascript" src="./alite.min.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="app"></div>
+    </div>
+    <script type="text/javascript">
+      var url = new URL(window.location.href);
+      console.log(new URL(window.location.href));
+      var mapName = new URL(window.location.href).searchParams.get("name");
+      var mapSet = new URL(window.location.href).searchParams.get("set");
+      new URLSearchParams();
+      alite({
+        url: "./data/" + mapSet + "/" + mapName + ".json",
+        method: "GET",
+      })
+        .then(function (result) {
+          var data = JSON.parse(result);
+
+          const App = () => {
+            return React.createElement(
+              React.Fragment,
+              null,
+              React.createElement(
+                "div",
+                {
+                  style: { height: "100vh", width: "100vw" },
+                },
+                (window.draw = React.createElement(ExcalidrawLib.Excalidraw, {
+                  initialData: {
+                    elements: ExcalidrawLib.convertToExcalidrawElements(data),
+                  },
+                  excalidrawAPI: function (e) {
+                    window.draw = e;
+                  },
+                  langCode: "zh-CN",
+                  viewModeEnabled: true,
+                }))
+              )
+            );
+          };
+
+          const excalidrawWrapper = document.getElementById("app");
+          const root = ReactDOM.createRoot(excalidrawWrapper);
+          root.render(React.createElement(App));
+        })
+        .catch(function (err) {
+          console.error(err);
+        });
+    </script>
+  </body>
+</html>
